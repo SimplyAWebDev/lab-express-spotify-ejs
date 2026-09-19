@@ -1,14 +1,12 @@
-  <h1>Search Results</h1>
-  <% artists.forEach(artist => { %>
-    <div>
-      <h3><%= artist.name %></h3>
-      <% if (artist.image) { %>
-        <img src="<%= artist.image %>" alt="Artist Image">
-      <% } else { %>
-        <p>No image available</p>
-      <% } %>
-      <a href="/albums/<%= artist._id%>">View Albums</a>
-
-    </div>
-  <% }) %>
-
+<h1>Search Results</h1>
+<% artists.forEach(artist => { %>
+  <div>
+    <h3><%= artist.name %></h3>
+    <% if (artist.image) { %>
+      <img src="<%= artist.image %>" alt="Artist Image">
+    <% } else { %>
+      <p>No image available</p>
+    <% } %>
+    <a href="/albums/<%= artist.id %>">View Albums</a>
+  </div>
+<% }) %>
