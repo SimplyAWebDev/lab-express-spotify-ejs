@@ -2,6 +2,8 @@ require('dotenv').config()
 
 const express = require('express')
 const expressLayouts = require('express-ejs-layouts')
+const helmet = require('helmet')
+const rateLimit = require('express-rate-limit')
 
 // require spotify-web-api-node package here:
 const SpotifyWebApi = require('spotify-web-api-node')
@@ -9,6 +11,30 @@ const SpotifyWebApi = require('spotify-web-api-node')
 
 
 const app = express()
+
+// Security headers. The default policy only allows resources from our own
+// origin, which would block the artwork and previews we render, so Spotify's
+// image and audio hosts are allowed explicitly.
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      ...helmet.contentSecurityPolicy.getDefaultDirectives(),
+      'img-src': ["'self'", 'https://i.scdn.co'],
+      'media-src': ["'self'", 'https://p.scdn.co'],
+    },
+  },
+}))
+
+// Our routes are a thin proxy in front of the Spotify API, and the quota they
+// spend belongs to our own credentials. Cap how fast a single client can use
+// it up.
+app.use(rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: 100,
+  standardHeaders: 'draft-7',
+  legacyHeaders: false,
+  message: 'Too many requests. Please wait a few minutes and try again.',
+}))
 
 app.use(expressLayouts)
 app.set('view engine', 'ejs')
